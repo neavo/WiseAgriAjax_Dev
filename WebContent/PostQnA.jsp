@@ -7,19 +7,20 @@
 		String QnAPublisher = request.getParameter("QnAPublisher");
 		String QnAPhone = request.getParameter("QnAPhone");
 		String QnAContent = request.getParameter("QnAContent");
-		String CategoryId = request.getParameter("CategoryId");
-		String AppId = eDBManager.GetValue("SELECT appid FROM categorys WHERE categoryid = " + CategoryId + " LIMIT 1", "appid");
-
+		String QnACategoryId = request.getParameter("QnACategoryId");
+		String AppId = eDBManager.GetValue("SELECT appid FROM categorys WHERE categoryid = " + QnACategoryId + " LIMIT 1", "appid");
+		String CategoryId = eDBManager.GetValue("SELECT categoryid FROM categorys WHERE parentid != 0 AND flag = 3 AND appid = " + AppId + " LIMIT 1", "categoryid");
+		
 		String SQL = "INSERT INTO question"
 			 + " ("
 			 + " publisher, telephone, question,"
-			 + " categoryid, appid,"
+			 + " appid, categoryid,"
 			 + " expertid, questiontype, publishtime"
 			 + " )"
 			 + " VALUE"
 			 + " ("
 			 + " \"" + QnAPublisher + "\", \"" + QnAPhone + "\", \"" + QnAContent + "\","
-			 + " \"" + CategoryId + "\", \"" + AppId + "\","
+			 + " \"" + AppId + "\", \"" + CategoryId + "\","
 			 + " \"0\", \"1\", Now()"
 			 + " )";
 

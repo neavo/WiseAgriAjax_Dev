@@ -10,22 +10,23 @@
 		String SnBPublisher = request.getParameter("SnBPublisher");
 		String SnBPhone = request.getParameter("SnBPhone");
 		String SnBContent = request.getParameter("SnBContent");
-		String CategoryId = request.getParameter("CategoryId");
-		String AppId = eDBManager.GetValue("SELECT appid FROM categorys WHERE categoryid = " + CategoryId + " LIMIT 1", "appid");
+		String SnBCategoryId = request.getParameter("SnBCategoryId");
+		String AppId = eDBManager.GetValue("SELECT appid FROM categorys WHERE categoryid = " + SnBCategoryId + " LIMIT 1", "appid");
 		int SnBType = Integer.parseInt(request.getParameter("SnBType"));
-
+		String CategoryId = eDBManager.GetValue("SELECT categoryid FROM categorys WHERE parentid != 0 AND flag = " + (SnBType+1) + " AND appid = " + AppId + " LIMIT 1", "categoryid");
+		
 		String SQL = "INSERT INTO publish"
 			 + " ("
 			 + " title, price, area,"
 			 + " publisher, telephone, content,"
-			 + " categoryid, appid, category,"
+			 + " appid, category, categoryid,"
 			 + " typeid, publishtime"
 			 + " )"
 			 + " VALUE"
 			 + " ("
 			 + " \"" + SnBTitle + "\", \"" + SnBPrice + "\", \"" + SnBArea + "\","
 			 + " \"" + SnBPublisher + "\", \"" + SnBPhone + "\", \"" + SnBContent + "\","
-			 + " \"" + CategoryId + "\", \"" + AppId + "\", \"" + SnBType + "\","
+			 + " \"" + AppId + "\", \"" + SnBType + "\", \"" + CategoryId + "\","
 			 + " \"1\", Now()"
 			 + " )";
 
