@@ -18,7 +18,7 @@ public class DBManager {
 			String DBName = "zhnydb";
 			String UserName = "root";
 			String PassWord = "lxt";
-			String Url = "jdbc:mysql://localhost/" + DBName + "?user=" + UserName + "&password=" + PassWord;
+			String Url = "jdbc:mysql://localhost/" + DBName + "?user=" + UserName + "&password=" + PassWord + "&characterEncoding=utf8";
 			Class.forName("com.mysql.jdbc.Driver").newInstance();
 			eConnection = DriverManager.getConnection(Url);
 		} catch (Exception e) {
@@ -83,6 +83,78 @@ public class DBManager {
 		return Record;
 	}
 
+	// 获取建议反馈列表
+	public String GetFeedBackList(String SQL) {
+		String JSON = "";
+		Connection eConnection = null;
+		Statement eStatement = null;
+		ResultSet eResultSet = null;
+		List <Map<String, String>> eList = new ArrayList <Map<String, String>>();
+
+		try {
+			eConnection = GetConnection();
+			eStatement = eConnection.createStatement();
+			eResultSet = eStatement.executeQuery(SQL);
+			while (eResultSet.next()) {
+				Map<String, String> eMap = new HashMap<String, String>(); 
+				
+				DoInsert(eMap, "CId", eResultSet.getString("commentid"));
+				DoInsert(eMap, "CContent", eResultSet.getString("comment"));
+				DoInsert(eMap, "CImageUrl", eResultSet.getString("imageurl1"));
+				DoInsert(eMap, "CPublisher", eResultSet.getString("publisher"));
+				DoInsert(eMap, "CDateTime", eResultSet.getString("publishtime"));
+				DoInsert(eMap, "CSkimNum", eResultSet.getString("skimnum"));
+				
+				eList.add(eMap);
+			}
+			JSON = JSON + JSONArray.fromObject(eList).toString();
+			JSON = JSON.replace("null", "");
+		} catch (Exception e) {
+			System.out.println(e.getMessage());
+		}
+		finally {
+			DbUtils.closeQuietly(eResultSet);
+			DbUtils.closeQuietly(eStatement);
+			DbUtils.closeQuietly(eConnection);
+		}
+		return JSON;
+	}
+	
+	// 获取建议反馈详细信息
+	public String GetFeedBackDetail(String SQL) {
+		String JSON = "";
+		Connection eConnection = null;
+		Statement eStatement = null;
+		ResultSet eResultSet = null;
+		List <Map<String, String>> eList = new ArrayList <Map<String, String>>();
+
+		try {
+			eConnection = GetConnection();
+			eStatement = eConnection.createStatement();
+			eResultSet = eStatement.executeQuery(SQL);
+			while (eResultSet.next()) {
+				Map<String, String> eMap = new HashMap<String, String>(); 
+						
+				DoInsert(eMap, "FContent", eResultSet.getString("content"));
+				DoInsert(eMap, "FImageUrl", eResultSet.getString("imageurl1"));
+				DoInsert(eMap, "FPublisher", eResultSet.getString("publisher"));
+				DoInsert(eMap, "FDateTime", eResultSet.getString("publishtime"));
+				
+				eList.add(eMap);
+			}
+			JSON = JSON + JSONArray.fromObject(eList).toString();
+			JSON = JSON.replace("null", "");
+		} catch (Exception e) {
+			System.out.println(e.getMessage());
+		}
+		finally {
+			DbUtils.closeQuietly(eResultSet);
+			DbUtils.closeQuietly(eStatement);
+			DbUtils.closeQuietly(eConnection);
+		}
+		return JSON;
+	}
+	
 	// 获取客户端列表
 	public String GetAppList(String SQL) {
 		String JSON = "";
@@ -203,9 +275,9 @@ public class DBManager {
 					} else if (CategoryType.equals("4")) {
 						DoInsert(eMap, "CategoryType", "ExpertCategory");
 					} else if (CategoryType.equals("7")) {
-						DoInsert(eMap, "CategoryType", "DoSnB");
+						DoInsert(eMap, "CategoryType", "PostSnB");
 					} else if (CategoryType.equals("8")) {
-						DoInsert(eMap, "CategoryType", "DoQnA");
+						DoInsert(eMap, "CategoryType", "PostQnA");
 					} else
 						DoInsert(eMap, "CategoryType", "");
 				}
